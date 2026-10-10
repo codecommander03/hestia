@@ -88,7 +88,7 @@ rule for every handoff, so there is nothing to get wrong at a canteen counter.
 |---|---|
 | Mobile app | React Native + Expo, Android only |
 | Admin panel | separate web app |
-| Backend | Python |
+| Backend | Python: FastAPI + SQLAlchemy + Alembic ([ADR 0001](docs/adr/0001-backend-framework.md)) |
 | Database | Postgres + PostGIS |
 | Hosting | one small cloud VM, ₹0/month on free tiers |
 
@@ -98,6 +98,7 @@ rule for every handoff, so there is nothing to get wrong at a canteen counter.
 |---|---|
 | [`docs/requirements.md`](docs/requirements.md) | actors, trust tiers, functional and non-functional requirements, tunables, open questions |
 | [`docs/data-model.md`](docs/data-model.md) | entities, relationships, how the schema enforces the consistency rules, ER diagram |
+| [`docs/adr/`](docs/adr/README.md) | architecture decision records, with rejected alternatives |
 | [`docs/img/CREDITS.md`](docs/img/CREDITS.md) | sources and licences for the engravings |
 
 ## Context
