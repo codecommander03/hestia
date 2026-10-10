@@ -1,6 +1,6 @@
 # Data Model
 
-> **Status:** v0.1 draft, 2026-10-09. Derived from `requirements.md` v0.1. Requirement IDs in the **Why** lines point back there.
+> **Status:** v0.1 draft, 2026-10-09. Derived from `requirements.md` v0.1. Requirement IDs in the **Why** lines point back there. Allowed status changes are in `state-machines.md`.
 
 ## Conventions
 
@@ -305,7 +305,7 @@ An NGO reserving all or part of a listing.
 | transport_mode | text | `NGO_PICKUP`, `OPEN_TO_CARRIERS`, `DONOR_DELIVERY` |
 | status | text | `ACTIVE`, `COMPLETED`, `CANCELLED`, `EXPIRED` |
 | cancel_reason | text | nullable |
-| acceptance_result | text | `ACCEPTED`, `PARTIAL`, `REJECTED`; null until recorded |
+| acceptance_result | text | `ACCEPTED`, `PARTIAL`, `REJECTED`, `AUTO_ACCEPTED` (window lapsed, see state-machines J4); null until recorded |
 | accepted_quantity | numeric(8,2) | nullable |
 | rejection_reason | text | `SPOILED`, `UNSAFE_TEMP`, `TAMPERED`, `NOT_AS_DESCRIBED`, `OTHER` |
 | rejection_photo_file_id | uuid | FK → File; optional |
@@ -332,6 +332,7 @@ The job of moving one claim from pickup to drop-off.
 | drop_location | geography(Point) | copied from the NGO's drop site |
 | pickup_deadline_at | timestamptz | set on accept (FR-TRN-9) |
 | safe_until_breached | boolean | FR-HND-11 |
+| cancel_reason | text | nullable; e.g. `CLAIM_CANCELLED`, `LOST_IN_TRANSIT` |
 | version | int | optimistic-lock counter |
 
 **Relationships:** belongs to one Claim; has many TaskAssignments, HandoffCodes and Handoffs.
@@ -386,10 +387,11 @@ The one-time code for one leg of a task.
 | locked_until | timestamptz | nullable |
 | expires_at | timestamptz | end of the step |
 | used_at | timestamptz | null until used |
+| voided_at | timestamptz | set when the task leaves this step (see `state-machines.md` §5) |
 
-Unique: `(task_id, leg)` where `used_at IS NULL`.
+Unique: `(task_id, leg)` where `used_at IS NULL AND voided_at IS NULL`.
 
-**Why:** `UPDATE … SET used_at = now() WHERE id = $id AND used_at IS NULL` makes reuse impossible even with two requests at the same moment (NFR-CON-4). Codes are kept apart from OtpChallenge because their rules are different: tied to a task and a leg, a lock-out instead of an expiry, and both sides notified on lock.
+**Why:** `UPDATE … SET used_at = now() WHERE id = $id AND used_at IS NULL AND voided_at IS NULL` makes reuse impossible even with two requests at the same moment (NFR-CON-4). Codes are kept apart from OtpChallenge because their rules are different: tied to a task and a leg, a lock-out instead of an expiry, and both sides notified on lock.
 
 ### Handoff
 What actually happened at each leg.
@@ -565,8 +567,8 @@ Makes retries safe (NFR-CON-7).
 | NFR-CON-1: never over-claimed | conditional `UPDATE` on `listings.quantity_claimed` + `CHECK (quantity_claimed <= quantity_total)` |
 | NFR-CON-2: one carrier per task | conditional `UPDATE … WHERE status = 'OPEN'` + partial unique index on TaskAssignment |
 | NFR-CON-3: carrier task limit | lock the carrier's User row, then count *(app)* |
-| NFR-CON-4: code used once | `UPDATE … WHERE used_at IS NULL` |
-| NFR-CON-5: valid transitions only | transition table in the service layer, guarded by `WHERE status = <expected>` *(app)* |
+| NFR-CON-4: code used once | `UPDATE … WHERE used_at IS NULL AND voided_at IS NULL` |
+| NFR-CON-5: valid transitions only | the tables in `state-machines.md`, each move a conditional `UPDATE … WHERE status = <expected>` *(app)* |
 | NFR-CON-6: at least one org admin | lock the Organisation row, then count admins *(app)* |
 | NFR-CON-7: idempotent writes | IdempotencyKey, in the same transaction |
 | NFR-INT-2: custody log can't change | database grants + trigger |

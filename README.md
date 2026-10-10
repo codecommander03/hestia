@@ -78,7 +78,7 @@ rule for every handoff, so there is nothing to get wrong at a canteen counter.
 
 ## Current state
 
-- **Design phase.** Requirements v0.1 and data model v0.1 are written.
+- **Design phase.** Requirements, data model and state machines (all v0.1) and ADR 0001 are written.
 - No backend, no app, no tests.
 - `docs/data-model.md` is the most useful thing here right now.
 
@@ -98,6 +98,7 @@ rule for every handoff, so there is nothing to get wrong at a canteen counter.
 |---|---|
 | [`docs/requirements.md`](docs/requirements.md) | actors, trust tiers, functional and non-functional requirements, tunables, open questions |
 | [`docs/data-model.md`](docs/data-model.md) | entities, relationships, how the schema enforces the consistency rules, ER diagram |
+| [`docs/state-machines.md`](docs/state-machines.md) | every allowed status change, what triggers it, and what it cascades to |
 | [`docs/adr/`](docs/adr/README.md) | architecture decision records, with rejected alternatives |
 | [`docs/img/CREDITS.md`](docs/img/CREDITS.md) | sources and licences for the engravings |
 
