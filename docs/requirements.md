@@ -428,7 +428,7 @@ These rules must **always** hold, even when requests arrive at the same moment o
 - **Platforms:**
   - Android app (React Native + Expo) for all users. **No iOS app.**
   - Separate web app for admins.
-- **Backend:** Python. The framework choice and the reasons for it go in an ADR.
+- **Backend:** Go. The framework choice and the reasons for it go in an ADR.
 - **Hosting:** one small cloud VM for the demo.
 - **No blockchain.** Handoffs are confirmed with OTPs, and records are protected by the hash-chained custody log. The ADR explains why:
   - blockchain can't prove the physical food wasn't tampered with (the oracle problem);

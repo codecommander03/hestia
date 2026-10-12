@@ -8,4 +8,5 @@ replaces the old one, and the old one's status becomes "Superseded by ADR NNNN".
 
 | # | Decision | Status |
 |---|---|---|
-| [0001](0001-backend-framework.md) | Backend framework: FastAPI + SQLAlchemy + Alembic | Accepted |
+| [0001](0001-backend-framework.md) | Backend framework: FastAPI + SQLAlchemy + Alembic | Superseded by [0002](0002-backend-go.md) |
+| [0002](0002-backend-go.md) | Backend in Go: Huma + sqlc/pgx + goose | Accepted |

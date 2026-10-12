@@ -1,6 +1,7 @@
-.venv/
-__pycache__/
-*.pyc
-.pytest_cache/
-.ruff_cache/
 .env
+
+# Go
+backend/bin/
+*.exe
+*.test
+coverage.out

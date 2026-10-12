@@ -1,6 +1,6 @@
 # ADR 0001: Backend framework
 
-- **Status:** Accepted
+- **Status:** Superseded by [ADR 0002](0002-backend-go.md)
 - **Date:** 2026-10-10
 - **Requirements:** NFR-MNT-1, NFR-MNT-2, NFR-CON-1 to 7, NFR-SCALE-3, FR-ADM-1, requirements §7
 

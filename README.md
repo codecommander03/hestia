@@ -78,7 +78,7 @@ rule for every handoff, so there is nothing to get wrong at a canteen counter.
 
 ## Current state
 
-- **Design phase.** Requirements, data model and state machines (all v0.1) and ADR 0001 are written.
+- **Design phase.** Requirements, data model and state machines (all v0.1) and ADRs 0001-0002 are written.
 - No backend, no app, no tests.
 - `docs/data-model.md` is the most useful thing here right now.
 
@@ -88,7 +88,7 @@ rule for every handoff, so there is nothing to get wrong at a canteen counter.
 |---|---|
 | Mobile app | React Native + Expo, Android only |
 | Admin panel | separate web app |
-| Backend | Python: FastAPI + SQLAlchemy + Alembic ([ADR 0001](docs/adr/0001-backend-framework.md)) |
+| Backend | Go: Huma + sqlc/pgx + goose ([ADR 0002](docs/adr/0002-backend-go.md)) |
 | Database | Postgres + PostGIS |
 | Hosting | one small cloud VM, ₹0/month on free tiers |
 
