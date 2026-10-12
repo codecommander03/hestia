@@ -5,3 +5,4 @@ backend/bin/
 *.exe
 *.test
 coverage.out
+.vscode/
