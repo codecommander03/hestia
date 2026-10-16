@@ -8,6 +8,7 @@ package db
 import (
 	"context"
 
+	"github.com/google/uuid"
 	"github.com/jackc/pgx/v5/pgtype"
 )
 
@@ -18,7 +19,7 @@ RETURNING id, name, email, phone, phone_verified_at, trust_tier, status, suspend
 `
 
 type CreateUserParams struct {
-	ID    pgtype.UUID
+	ID    uuid.UUID
 	Name  pgtype.Text
 	Email pgtype.Text
 }
