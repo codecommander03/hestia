@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"errors"
 	"log"
 	"net/http"
 	"os"
@@ -10,6 +11,7 @@ import (
 	"github.com/danielgtaylor/huma/v2"
 	"github.com/danielgtaylor/huma/v2/adapters/humago"
 	"github.com/google/uuid"
+	"github.com/jackc/pgx/v5/pgconn"
 	"github.com/jackc/pgx/v5/pgtype"
 	"github.com/jackc/pgx/v5/pgxpool"
 	"github.com/joho/godotenv"
@@ -25,8 +27,8 @@ type HealthOutput struct {
 
 type CreateUserInput struct {
 	Body struct {
-		Name  string `json:"name" minLength:"1" maxlength:"100"`
-		Email string `json:"email" format: "email"`
+		Name  string `json:"name" minLength:"1" maxLength:"100"`
+		Email string `json:"email" format:"email"`
 	}
 }
 
@@ -91,8 +93,12 @@ func main() {
 			Email: pgtype.Text{String: input.Body.Email, Valid: true},
 		})
 		if err != nil {
+			var pgErr *pgconn.PgError
+			if errors.As(err, &pgErr) && pgErr.Code == "23505" {
+				return nil, huma.Error409Conflict("email already registered")
+			}
 			log.Printf("create user: %v", err)
-			return nil, huma.Error500InternalServerError("could not create user")
+			return nil, huma.Error409Conflict("duplicate email")
 		}
 
 		resp := &UserOutput{}
