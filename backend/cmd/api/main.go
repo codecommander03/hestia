@@ -11,10 +11,10 @@ import (
 	"github.com/danielgtaylor/huma/v2"
 	"github.com/danielgtaylor/huma/v2/adapters/humago"
 	"github.com/google/uuid"
+	"github.com/jackc/pgx/v5"
 	"github.com/jackc/pgx/v5/pgconn"
 	"github.com/jackc/pgx/v5/pgtype"
 	"github.com/jackc/pgx/v5/pgxpool"
-	"github.com/jackc/pgx/v5"
 	"github.com/joho/godotenv"
 
 	"github.com/codecommander03/hestia/backend/internal/db"
@@ -45,6 +45,17 @@ type UserOutput struct {
 		Status    string    `json:"status"`
 		CreatedAt time.Time `json:"created_at"`
 	}
+}
+
+// newUserOutput converts a database row into the shape the API returns.
+func newUserOutput(user db.User) *UserOutput {
+	resp := &UserOutput{}
+	resp.Body.ID = user.ID.String()
+	resp.Body.Name = user.Name.String
+	resp.Body.Email = user.Email.String
+	resp.Body.Status = user.Status
+	resp.Body.CreatedAt = user.CreatedAt.Time
+	return resp
 }
 
 func main() {
@@ -106,13 +117,7 @@ func main() {
 			return nil, huma.Error500InternalServerError("error creating the user")
 		}
 
-		resp := &UserOutput{}
-		resp.Body.ID = user.ID.String()
-		resp.Body.Name = user.Name.String
-		resp.Body.Email = user.Email.String
-		resp.Body.Status = user.Status
-		resp.Body.CreatedAt = user.CreatedAt.Time
-		return resp, nil
+		return newUserOutput(user), nil
 	})
 
 	huma.Get(api, "/users/{id}", func(ctx context.Context, input *GetUserInput) (*UserOutput, error) {
@@ -129,13 +134,7 @@ func main() {
 			return nil, huma.Error500InternalServerError("could not get user")
 		}
 
-		resp := &UserOutput{}
-		resp.Body.ID = user.ID.String()
-		resp.Body.Name = user.Name.String
-		resp.Body.Email = user.Email.String
-		resp.Body.Status = user.Status
-		resp.Body.CreatedAt = user.CreatedAt.Time
-		return resp, nil
+		return newUserOutput(user), nil
 	})
 
 	log.Fatal(http.ListenAndServe(":8080", mux))
