@@ -14,6 +14,7 @@ import (
 	"github.com/jackc/pgx/v5/pgconn"
 	"github.com/jackc/pgx/v5/pgtype"
 	"github.com/jackc/pgx/v5/pgxpool"
+	"github.com/jackc/pgx/v5"
 	"github.com/joho/godotenv"
 
 	"github.com/codecommander03/hestia/backend/internal/db"
@@ -30,6 +31,10 @@ type CreateUserInput struct {
 		Name  string `json:"name" minLength:"1" maxLength:"100"`
 		Email string `json:"email" format:"email"`
 	}
+}
+
+type GetUserInput struct {
+	ID string `path:"id" format:"uuid"`
 }
 
 type UserOutput struct {
@@ -98,7 +103,30 @@ func main() {
 				return nil, huma.Error409Conflict("email already registered")
 			}
 			log.Printf("create user: %v", err)
-			return nil, huma.Error409Conflict("duplicate email")
+			return nil, huma.Error500InternalServerError("error creating the user")
+		}
+
+		resp := &UserOutput{}
+		resp.Body.ID = user.ID.String()
+		resp.Body.Name = user.Name.String
+		resp.Body.Email = user.Email.String
+		resp.Body.Status = user.Status
+		resp.Body.CreatedAt = user.CreatedAt.Time
+		return resp, nil
+	})
+
+	huma.Get(api, "/users/{id}", func(ctx context.Context, input *GetUserInput) (*UserOutput, error) {
+		id, err := uuid.Parse(input.ID)
+		if err != nil {
+			return nil, huma.Error400BadRequest("invalid user id")
+		}
+		user, err := queries.GetUserByID(ctx, id)
+		if err != nil {
+			if errors.Is(err, pgx.ErrNoRows) {
+				return nil, huma.Error404NotFound("user not found")
+			}
+			log.Printf("get user: %v", err)
+			return nil, huma.Error500InternalServerError("could not get user")
 		}
 
 		resp := &UserOutput{}
