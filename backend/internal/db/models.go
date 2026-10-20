@@ -5,9 +5,25 @@
 package db
 
 import (
+	"net/netip"
+
 	"github.com/google/uuid"
 	"github.com/jackc/pgx/v5/pgtype"
 )
+
+type OtpChallenge struct {
+	ID         uuid.UUID
+	Purpose    string
+	Target     string
+	UserID     uuid.NullUUID
+	CodeHash   []byte
+	Attempts   int16
+	ExpiresAt  pgtype.Timestamptz
+	ConsumedAt pgtype.Timestamptz
+	RequestIp  netip.Addr
+	CreatedAt  pgtype.Timestamptz
+	UpdatedAt  pgtype.Timestamptz
+}
 
 type User struct {
 	ID                   uuid.UUID
