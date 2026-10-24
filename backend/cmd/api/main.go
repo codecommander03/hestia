@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"encoding/hex"
 	"log"
 	"net/http"
 	"os"
@@ -27,6 +28,15 @@ func main() {
 	dbURL, ok := os.LookupEnv("DATABASE_URL")
 	if !ok {
 		log.Fatal("DATABASE_URL is not set")
+	}
+
+	otpSecretHex, ok := os.LookupEnv("OTP_SECRET")
+	if !ok {
+		log.Fatal("OTP_SECRET is not set")
+	}
+	otpSecret, err := hex.DecodeString(otpSecretHex)
+	if err != nil || len(otpSecret) < 32 {
+		log.Fatal("OTP_SECRET must be at least 64 hex characters")
 	}
 
 	ctx := context.Background()
@@ -55,6 +65,7 @@ func main() {
 	})
 
 	handlers.RegisterUsers(api, queries)
+	handlers.RegisterAuth(api, queries, otpSecret)
 
 	log.Fatal(http.ListenAndServe(":8080", mux))
 }
